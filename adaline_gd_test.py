@@ -5,15 +5,16 @@ import os
 import adaline_gd as agd
 
 
-def test(eta1, eta2, epochs, X, y):
+def test(eta1, eta2, epochs, X, y, std):
+    if (std): X = standardize(X)
     ada1 = agd.AdalineGD(eta=eta1, n_iter=epochs).fit(X, y)
     ada2 = agd.AdalineGD(eta=eta2, n_iter=epochs).fit(X, y)
 
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10,4))
 
-    ax[0].plot(range(1, len(ada1.cost_) + 1), np.log10(ada1.cost_), marker='o')
+    ax[0].plot(range(1, len(ada1.cost_) + 1), ada1.cost_, marker='o')
     ax[0].set_xlabel('Epochs')
-    ax[0].set_ylabel('log(SSE)')
+    ax[0].set_ylabel('SSE')
     ax[0].set_title('Adaline, eta=0.01')
 
     ax[1].plot(range(1, len(ada2.cost_) + 1), ada2.cost_, marker='o')
@@ -36,3 +37,10 @@ def downloaddataset():
     url = os.path.join('https://archive.ics.uci.edu','ml','machine-learning-databases','iris','iris.data')
     df = pd.read_csv(url, header=None, encoding='utf-8')
     return df
+
+
+def standardize(X):
+    X_std = np.copy(X)
+    X_std[:,0] = (X[:,0] - X[:,0].mean()) / X[:,0].std()
+    X_std[:,1] = (X[:,1] - X[:,1].mean()) / X[:,1].std()
+    return X_std
